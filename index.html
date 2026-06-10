@@ -48,13 +48,18 @@
     padding: 0;
 }
 
+html, body {
+    width: 100%;
+    overflow-x: hidden;
+}
+
 body {
     background-color: var(--bg-main);
     color: var(--text-primary);
     font-family: var(--font-sans);
     line-height: 1.6;
-    overflow-x: hidden;
     scroll-behavior: smooth;
+    position: relative;
 }
 
 /* Custom Scrollbar */
@@ -830,8 +835,11 @@ footer p {
     </style>
 </head>
 <body>
-    <div class="glow-backdrop"></div>
-    <div class="glow-backdrop-2"></div>
+    <!-- Background Glow Backdrop Container -->
+    <div class="glow-container" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; overflow: hidden; pointer-events: none; z-index: 0;">
+        <div class="glow-backdrop"></div>
+        <div class="glow-backdrop-2"></div>
+    </div>
 
     <!-- Header Navigation -->
     <header>
@@ -1346,7 +1354,7 @@ Get-Service -Name "Grafana"</code></pre>
 
     <!-- Footer -->
     <footer>
-        <div class="max-width: 1200px; margin: 0 auto;">
+        <div style="max-width: 1200px; margin: 0 auto;">
             <p>&copy; 2026 Grafana Navigator. Designed for fast and efficient systems deployment.</p>
             <p>Read more detailed guides at <a href="https://grafana.com/docs/" target="_blank">Grafana Documentation</a>.</p>
         </div>
