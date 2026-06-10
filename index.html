@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grafana Installation & CLI Reference Guide | DevOps Edition</title>
+    <meta name="description" content="A comprehensive, interactive developer guide for installing Grafana on Windows, Linux, macOS, and Docker, including Windows Service setups and basic CLI commands.">
+    <style>
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+    --bg-main: #090a0f;
+    --bg-card: #16171d;
+    --bg-card-hover: #1f2129;
+    --bg-code: #0b0c10;
+    --border-color: rgba(255, 255, 255, 0.08);
+    --border-hover: rgba(240, 90, 40, 0.3);
+    
+    --text-primary: #f5f6f9;
+    --text-secondary: #9fa6b2;
+    --text-muted: #626a76;
+    
+    --primary-orange: #f05a28;
+    --primary-orange-glow: rgba(240, 90, 40, 0.15);
+    --primary-blue: #3886e1;
+    --primary-blue-glow: rgba(56, 134, 225, 0.15);
+    --accent-green: #37d67a;
+    --accent-green-glow: rgba(55, 214, 122, 0.15);
+    
+    --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-mono: 'Fira Code', monospace;
+    
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.4);
+    
+    --radius-sm: 6px;
+    --radius-md: 12px;
+    --radius-lg: 20px;
+    
+    --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    line-height: 1.6;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: var(--bg-main);
+}
+::-webkit-scrollbar-thumb {
+    background: #2b2e38;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-orange);
+}
+
+/* Background Glow Effects */
+.glow-backdrop {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(240, 90, 40, 0.05) 0%, rgba(0, 0, 0, 0) 70%);
+    top: -200px;
+    right: -100px;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.glow-backdrop-2 {
+    position: absolute;
+    width: 500px;
+    height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(56, 134, 225, 0.04) 0%, rgba(0, 0, 0, 0) 70%);
+    top: 600px;
+    left: -200px;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Navigation & Header */
+header {
+    background: rgba(22, 23, 29, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.25rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.4rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--text-primary);
+    text-decoration: none;
+}
+
+.logo span {
+    background: linear-gradient(135deg, var(--primary-orange) 0%, #ff8a50 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.logo svg {
+    width: 28px;
+    height: 28px;
+    fill: var(--primary-orange);
+    filter: drop-shadow(0 0 8px rgba(240, 90, 40, 0.4));
+}
+
+.nav-links {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+}
+
+.nav-links a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: var(--transition);
+}
+
+.nav-links a:hover {
+    color: var(--primary-orange);
+}
+
+/* Hero Section */
+.hero {
+    position: relative;
+    max-width: 1200px;
+    margin: 4rem auto 2rem auto;
+    padding: 0 2rem;
+    text-align: center;
+    z-index: 1;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--primary-orange-glow);
+    border: 1px solid rgba(240, 90, 40, 0.3);
+    color: #ff9d76;
+    padding: 0.4rem 1rem;
+    border-radius: 100px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    animation: pulseGlow 3s infinite alternate;
+}
+
+@keyframes pulseGlow {
+    0% { box-shadow: 0 0 8px rgba(240, 90, 40, 0.1); }
+    100% { box-shadow: 0 0 16px rgba(240, 90, 40, 0.25); }
+}
+
+.hero h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -1.5px;
+    margin-bottom: 1.5rem;
+}
+
+.hero h1 span {
+    background: linear-gradient(135deg, #ff8a50 0%, var(--primary-orange) 50%, #d83d0c 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.hero p {
+    font-size: 1.25rem;
+    color: var(--text-secondary);
+    max-width: 700px;
+    margin: 0 auto 2.5rem auto;
+    font-weight: 400;
+}
+
+/* Container & Grid layout */
+.main-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    position: relative;
+    z-index: 1;
+}
+
+/* Platform Switcher Section */
+.card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem;
+    box-shadow: var(--shadow-md);
+    margin-bottom: 3rem;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--border-hover), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+}
+
+.card:hover::before {
+    transform: translateX(100%);
+}
+
+.card-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.card-title svg {
+    width: 24px;
+    height: 24px;
+    fill: var(--primary-orange);
+}
+
+/* Tabs styles */
+.tabs-header {
+    display: flex;
+    gap: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 1rem;
+    margin-bottom: 2rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.tabs-header::-webkit-scrollbar {
+    display: none;
+}
+
+.tab-btn {
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--text-secondary);
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-md);
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+    transition: var(--transition);
+}
+
+.tab-btn svg {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+}
+
+.tab-btn:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.tab-btn.active {
+    color: var(--primary-orange);
+    background: var(--primary-orange-glow);
+    border-color: rgba(240, 90, 40, 0.25);
+}
+
+/* Tab content panes */
+.tab-pane {
+    display: none;
+    animation: fadeIn 0.4s ease;
+}
+
+.tab-pane.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Grid Layout for Steps */
+.steps-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+}
+
+.step-card {
+    background: rgba(255, 255, 255, 0.015);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    transition: var(--transition);
+}
+
+.step-card:hover {
+    background: rgba(255, 255, 255, 0.025);
+    border-color: var(--border-hover);
+}
+
+.step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--primary-orange);
+    color: var(--bg-main);
+    font-weight: 800;
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+}
+
+.step-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+}
+
+.step-desc {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    margin-bottom: 1.25rem;
+}
+
+/* Code Blocks with Copy Functionality */
+.code-container {
+    position: relative;
+    background: var(--bg-code);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-sm);
+    padding: 1.25rem;
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    margin-bottom: 1rem;
+}
+
+.code-container pre {
+    margin: 0;
+}
+
+.code-container code {
+    color: #e2e8f0;
+    font-size: 0.9rem;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+.copy-btn {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
+    padding: 0.4rem;
+    cursor: pointer;
+    transition: var(--transition);
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.copy-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    border-color: var(--primary-orange);
+}
+
+.copy-btn svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+}
+
+/* Clipboard toast/tooltip feedback */
+.copy-btn::after {
+    content: 'Copy';
+    position: absolute;
+    bottom: 100%;
+    right: 50%;
+    transform: translateX(50%) translateY(-5px);
+    background: #1f2129;
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+    pointer-events: none;
+    opacity: 0;
+    transition: var(--transition);
+    white-space: nowrap;
+}
+
+.copy-btn:hover::after {
+    opacity: 1;
+    transform: translateX(50%) translateY(-8px);
+}
+
+.copy-btn.copied::after {
+    content: 'Copied!';
+    background: var(--accent-green-glow);
+    border-color: var(--accent-green);
+    color: #a7f3d0;
+}
+
+.copy-btn.copied svg {
+    fill: var(--accent-green);
+}
+
+/* Callout Info Boxes */
+.callout {
+    background: rgba(56, 134, 225, 0.05);
+    border-left: 4px solid var(--primary-blue);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    padding: 1.25rem;
+    margin-top: 1rem;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+}
+
+.callout.warning {
+    background: rgba(240, 90, 40, 0.05);
+    border-left-color: var(--primary-orange);
+}
+
+.callout-title {
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.callout-title svg {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+}
+
+.callout.info .callout-title { color: var(--primary-blue); }
+.callout.warning .callout-title { color: var(--primary-orange); }
+
+/* Windows Service Section Specific Layouts */
+.windows-deep-dive {
+    margin-top: 2.5rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.win-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+@media (max-width: 900px) {
+    .win-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Search and CLI Commands Section */
+.cli-section {
+    display: grid;
+    grid-template-columns: 1.8fr 1.2fr;
+    gap: 2rem;
+}
+
+@media (max-width: 992px) {
+    .cli-section {
+        grid-template-columns: 1fr;
+    }
+}
+
+.search-container {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.search-input {
+    width: 100%;
+    background: var(--bg-code);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 1rem 1rem 1rem 3rem;
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    transition: var(--transition);
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--primary-orange);
+    box-shadow: 0 0 15px var(--primary-orange-glow);
+}
+
+.search-icon {
+    position: absolute;
+    left: 1.25rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    fill: var(--text-muted);
+    pointer-events: none;
+    transition: var(--transition);
+}
+
+.search-input:focus + .search-icon {
+    fill: var(--primary-orange);
+}
+
+/* Command Accordion/List */
+.commands-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.command-item {
+    background: rgba(255, 255, 255, 0.01);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 1.25rem;
+    transition: var(--transition);
+}
+
+.command-item:hover {
+    background: rgba(255, 255, 255, 0.02);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.command-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.command-name {
+    font-family: var(--font-mono);
+    color: var(--primary-orange);
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.command-tag {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    color: var(--text-secondary);
+}
+
+.command-desc {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.75rem;
+}
+
+/* Command Builder Form Widget */
+.builder-card {
+    background: linear-gradient(135deg, rgba(22, 23, 29, 0.9) 0%, rgba(14, 15, 19, 0.9) 100%);
+    border: 1px solid rgba(240, 90, 40, 0.15);
+    box-shadow: 0 8px 32px rgba(240, 90, 40, 0.05);
+    height: fit-content;
+}
+
+.builder-field {
+    margin-bottom: 1.25rem;
+}
+
+.builder-label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.builder-input, .builder-select {
+    width: 100%;
+    background: var(--bg-code);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 0.75rem;
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    transition: var(--transition);
+}
+
+.builder-input:focus, .builder-select:focus {
+    outline: none;
+    border-color: var(--primary-orange);
+}
+
+.builder-output {
+    margin-top: 1.5rem;
+}
+
+.builder-btn {
+    width: 100%;
+    background: var(--primary-orange);
+    color: var(--bg-main);
+    border: none;
+    padding: 0.85rem;
+    border-radius: var(--radius-sm);
+    font-weight: 700;
+    cursor: pointer;
+    font-family: var(--font-sans);
+    transition: var(--transition);
+    box-shadow: 0 4px 12px rgba(240, 90, 40, 0.25);
+}
+
+.builder-btn:hover {
+    background: #ff7043;
+    box-shadow: 0 6px 16px rgba(240, 90, 40, 0.4);
+    transform: translateY(-1px);
+}
+
+/* Environment Info Grid */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.info-card {
+    background: rgba(255, 255, 255, 0.015);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.info-card-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.info-card-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.info-card-val {
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    color: var(--text-primary);
+}
+
+/* Footer styling */
+footer {
+    background: #06070a;
+    border-top: 1px solid var(--border-color);
+    padding: 3rem 2rem;
+    margin-top: 4rem;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    position: relative;
+    z-index: 1;
+}
+
+footer a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+footer a:hover {
+    color: var(--primary-orange);
+}
+
+footer p {
+    margin-bottom: 0.5rem;
+}
+    </style>
+</head>
+<body>
+    <div class="glow-backdrop"></div>
+    <div class="glow-backdrop-2"></div>
+
+    <!-- Header Navigation -->
+    <header>
+        <div class="nav-container">
+            <a href="#" class="logo" id="nav-logo">
+                <!-- Grafana-like flame/bar chart logo -->
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14.5h-2v-5h2v5zm0-6.5h-2V8h2v2z"/>
+                    <path d="M12 4c-4.41 0-8 3.59-8 8s3.59 8 8 8 8-3.59 8-8-3.59-8-8-8zm0 13c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z" opacity="0.3"/>
+                </svg>
+                <span>Grafana DevOps Guide</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="#install-section">Installation</a></li>
+                <li><a href="#windows-service-section">Windows Deep Dive</a></li>
+                <li><a href="#cli-section">CLI Cheat Sheet</a></li>
+                <li><a href="#builder-section">Plugin Builder</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="badge">
+            <svg style="width: 14px; height: 14px; fill: currentColor;" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+            </svg>
+            Production Deployment Reference Guide
+        </div>
+        <h1>Deploy & Manage <span>Grafana</span> Everywhere</h1>
+        <p>A high-performance DevOps reference sheet for setting up Grafana analytics environments on Windows, Linux, macOS, and containerized architectures.</p>
+    </section>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <!-- Interactive Environment Reference Stats Card -->
+        <section class="info-grid">
+            <div class="info-card">
+                <div class="info-card-icon">🌐</div>
+                <div class="info-card-title">Default Dashboard Address</div>
+                <div class="info-card-val">http://localhost:3000</div>
+            </div>
+            <div class="info-card">
+                <div class="info-card-icon">👤</div>
+                <div class="info-card-title">Initial Username</div>
+                <div class="info-card-val">admin</div>
+            </div>
+            <div class="info-card">
+                <div class="info-card-icon">🔑</div>
+                <div class="info-card-title">Initial Password</div>
+                <div class="info-card-val">admin</div>
+            </div>
+            <div class="info-card">
+                <div class="info-card-icon">⚙️</div>
+                <div class="info-card-title">Standard TCP Port</div>
+                <div class="info-card-val">3000</div>
+            </div>
+        </section>
+
+        <!-- Section: OS Installation Switcher -->
+        <section id="install-section" class="card" style="margin-top: 3rem;">
+            <div class="card-title">
+                <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM19 18H6c-2.21 0-4-1.79-4-4 0-2.05 1.53-3.76 3.56-3.97l1.07-.11.5-.95C8.08 7.14 9.94 6 12 6c2.62 0 4.88 1.86 5.39 4.43l.3 1.5 1.53.11c1.56.1 2.78 1.41 2.78 2.96 0 1.65-1.35 3-3 3zm-5.55-8h-2.9v3H8l4 4 4-4h-2.55z"/></svg>
+                Select Your Platform
+            </div>
+
+            <!-- Custom Custom Tabs Switcher -->
+            <div class="tabs-header">
+                <button class="tab-btn active" data-tab="windows">
+                    <svg viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.45H0V3.449zM0 12.45h9.75v9.45L0 20.551v-8.101zm10.75-10.5L24 0v11.55H10.75V1.95zM10.75 12.45H24v11.55l-13.25-1.95V12.45z"/></button>
+                    Windows
+                </button>
+                <button class="tab-btn" data-tab="ubuntu">
+                    <!-- Ubuntu Icon / Linux -->
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                    Ubuntu / Debian
+                </button>
+                <button class="tab-btn" data-tab="centos">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                    RHEL / CentOS
+                </button>
+                <button class="tab-btn" data-tab="macos">
+                    <svg viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.17c.66-.81 1.11-1.93.99-3.06-.96.04-2.13.64-2.82 1.45-.6.7-1.13 1.84-.99 2.94.97.08 2.07-.52 2.82-1.33z"/></svg>
+                    macOS
+                </button>
+                <button class="tab-btn" data-tab="docker">
+                    <svg viewBox="0 0 24 24"><path d="M13.983 11.078h2.119c.102 0 .186-.084.186-.186V8.773c0-.102-.084-.186-.186-.186h-2.119c-.102 0-.186.084-.186.186v2.119c0 .101.085.186.186.186zm-2.916-2.119v2.119c0 .102.084.186.186.186h2.119c.102 0 .186-.084.186-.186V8.773c0-.102-.084-.186-.186-.186h-2.119c-.103 0-.186.084-.186.186zm-2.916 2.119h2.119c.102 0 .186-.084.186-.186V8.773c0-.102-.084-.186-.186-.186H8.151c-.102 0-.186.084-.186.186v2.119c0 .101.084.186.186.186zm-2.916 0h2.119c.102 0 .186-.084.186-.186V8.773c0-.102-.084-.186-.186-.186H5.235c-.102 0-.186.084-.186.186v2.119c0 .101.084.186.186.186zm-2.916 0h2.119c.102 0 .186-.084.186-.186V8.773c0-.102-.084-.186-.186-.186H2.319c-.102 0-.186.084-.186.186v2.119c0 .101.084.186.186.186zm8.748-2.916h2.119c.102 0 .186-.084.186-.186V5.857c0-.102-.084-.186-.186-.186h-2.119c-.102 0-.186.084-.186.186v2.119c0 .102.085.186.186.186zm-2.916 0h2.119c.102 0 .186-.084.186-.186V5.857c0-.102-.084-.186-.186-.186H8.151c-.102 0-.186.084-.186.186v2.119c0 .102.084.186.186.186zm-2.916 0h2.119c.102 0 .186-.084.186-.186V5.857c0-.102-.084-.186-.186-.186H5.235c-.102 0-.186.084-.186.186v2.119c0 .102.084.186.186.186zm6.725-3.003h2.119c.102 0 .186-.084.186-.186V2.854c0-.102-.084-.186-.186-.186h-2.119c-.102 0-.186.084-.186.186v2.119c0 .102.085.186.186.186zM23.957 11.2c-.225-2.844-2.524-4.887-5.088-4.887-.075 0-.147.012-.222.015-.369-1.992-1.92-3.468-3.902-3.618C14.508 2.68 14.2 2.5 13.882 2.5c-.321 0-.627.18-.867.21-.072.009-.144-.009-.216-.009H2.133c-.366 0-.66.294-.66.66v11.75c0 4.197 3.396 7.424 7.6 7.424 5.304 0 9.072-4.14 11.838-7.794.66-.88.666-2.072.483-3.238l.563-.102z"/></svg>
+                    Docker
+                </button>
+            </div>
+
+            <!-- Windows installation guide -->
+            <div id="windows" class="tab-pane active">
+                <div class="steps-grid">
+                    <div class="step-card">
+                        <div class="step-num">1</div>
+                        <div class="step-title">Option A: MSI Installer (Recommended)</div>
+                        <div class="step-desc">Download and run the official MSI installer wizard which handles paths and services automatically.</div>
+                        <div class="code-container">
+                            <pre><code># Download installer from grafana.com/grafana/download
+# Run the MSI file and follow standard prompts.</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="step-card">
+                        <div class="step-num">2</div>
+                        <div class="step-title">Option B: Standalone ZIP Package</div>
+                        <div class="step-desc">Extract the package to your preferred location (e.g. <code>C:\grafana</code>). Open PowerShell as Administrator and run the server binary.</div>
+                        <div class="code-container">
+                            <button class="copy-btn" title="Copy to clipboard">
+                                <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                            </button>
+                            <pre><code># Navigate into extracted Grafana directory
+cd C:\grafana
+
+# Run Grafana Server in the foreground
+.\bin\grafana-server.exe</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="step-card">
+                        <div class="step-num">3</div>
+                        <div class="step-title">Configure Environment Variable (Optional)</div>
+                        <div class="step-desc">Add Grafana's bin folder to the System environment variable path for convenience so you can type <code>grafana-server</code> from anywhere.</div>
+                        <div class="code-container">
+                            <button class="copy-btn" title="Copy to clipboard">
+                                <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                            </button>
+                            <pre><code># Set PATH environment variable via PowerShell (Admin)
+[Environment]::SetEnvironmentVariable("Path", $env:Path + ";C:\grafana\bin", "Machine")</code></pre>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="callout warning">
+                    <div class="callout-title">
+                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                        Port Conflict Checks (TCP 3000)
+                    </div>
+                    If Grafana fails to bind to port 3000, verify which application is blocking it:
+                    <div class="code-container" style="margin-top: 0.75rem;">
+                        <button class="copy-btn" title="Copy to clipboard">
+                            <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                        </button>
+                        <pre><code>netstat -ano | findstr 3000</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ubuntu / Debian Installation Guide -->
+            <div id="ubuntu" class="tab-pane">
+                <div class="steps-grid">
+                    <div class="step-card">
+                        <div class="step-num">1</div>
+                        <div class="step-title">Add APT Repositories & Import GPG Keys</div>
+                        <div class="step-desc">Configure security keys and fetch the official stable releases list.</div>
+                        <div class="code-container">
+                            <button class="copy-btn" title="Copy to clipboard">
+                                <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                            </button>
+                            <pre><code>sudo apt-get install -y apt-transport-https software-properties-common wget
+sudo mkdir -p /etc/apt/keyrings/
+wget -q -O - https://apt.grafana.com/gpg.key | gpg --dearmor | sudo tee /etc/apt/keyrings/grafana.gpg > /dev/null
+echo "deb [signed-by=/etc/apt/keyrings/grafana.gpg] https://apt.grafana.com stable main" | sudo tee /etc/apt/sources.list.d/grafana.list</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="step-card">
+                        <div class="step-num">2</div>
+                        <div class="step-title">Install Grafana OSS</div>
+                        <div class="step-desc">Update lists and trigger installation of the latest stable build.</div>
+                        <div class="code-container">
+                            <button class="copy-btn" title="Copy to clipboard">
+                                <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                            </button>
+                            <pre><code>sudo apt-get update
+sudo apt-get install grafana</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="step-card">
+                        <div class="step-num">3</div>
+                        <div class="step-title">Start and Enable Systemd Service</div>
+                        <div class="step-desc">Ensure Grafana starts automatically during system reboot cycles.</div>
+                        <div class="code-container">
+                            <button class="copy-btn" title="Copy to clipboard">
+                                <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                            </button>
+                            <pre><code>sudo systemctl daemon-reload
+sudo systemctl start grafana-server
+sudo systemctl enable grafana-server</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CentOS / RHEL Installation Guide -->
+            <div id="centos" class="tab-pane">
+                <div class="steps-grid">
+                    <div class="step-card">
+                        <div class="step-num">1</div>
+                        <div class="step-title">Configure YUM / DNF Repo File</div>
+                        <div class="step-desc">Create <code>/etc/yum.repos.d/grafana.repo</code> containing the installation path configs.</div>
+                        <div class="code-container">
+                            <button class="copy-btn" title="Copy to clipboard">
+                                <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                            </button>
+                            <pre><code>cat &lt;&lt;EOF | sudo tee /etc/yum.repos.d/grafana.repo
+[grafana]
+name=grafana
+baseurl=https://rpm.grafana.com
+repo_gpgcheck=1
+enabled=1
+gpgcheck=1
+gpgkey=https://rpm.grafana.com/gpg.key
+sslverify=1
+sslcacert=/etc/pki/tls/certs/ca-bundle.crt
+EOF</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="step-card">
+                        <div class="step-num">2</div>
+                        <div class="step-title">Install and Run</div>
+                        <div class="step-desc">Fetch Grafana from the repositories and trigger the standard systemd service processes.</div>
+                        <div class="code-container">
+                            <button class="copy-btn" title="Copy to clipboard">
+                                <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                            </button>
+                            <pre><code>sudo dnf install grafana -y
+sudo systemctl daemon-reload
+sudo systemctl start grafana-server
+sudo systemctl enable grafana-server</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- macOS Installation Guide -->
+            <div id="macos" class="tab-pane">
+                <div class="steps-grid">
+                    <div class="step-card">
+                        <div class="step-num">1</div>
+                        <div class="step-title">Use Homebrew to Install</div>
+                        <div class="step-desc">Run update commands and install via the Homebrew package repository.</div>
+                        <div class="code-container">
+                            <button class="copy-btn" title="Copy to clipboard">
+                                <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                            </button>
+                            <pre><code>brew update
+brew install grafana</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="step-card">
+                        <div class="step-num">2</div>
+                        <div class="step-title">Manage Background Services</div>
+                        <div class="step-desc">Launch Grafana as a system agent background daemon service or run it manually.</div>
+                        <div class="code-container">
+                            <button class="copy-btn" title="Copy to clipboard">
+                                <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                            </button>
+                            <pre><code># To start grafana and run on system login
+brew services start grafana
+
+# Alternately, run manually inside the terminal foreground:
+grafana server --config=/opt/homebrew/etc/grafana/grafana.ini</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Docker Installation Guide -->
+            <div id="docker" class="tab-pane">
+                <div class="steps-grid">
+                    <div class="step-card">
+                        <div class="step-num">1</div>
+                        <div class="step-title">Run Container and Expose Ports</div>
+                        <div class="step-desc">Pull the official Enterprise repository image and expose container port 3000 to the local environment.</div>
+                        <div class="code-container">
+                            <button class="copy-btn" title="Copy to clipboard">
+                                <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                            </button>
+                            <pre><code>docker run -d -p 3000:3000 --name=grafana grafana/grafana-enterprise</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="step-card">
+                        <div class="step-num">2</div>
+                        <div class="step-title">Mount Configs and Databases (Persistent Storage)</div>
+                        <div class="step-desc">Launch Grafana container with local mapping to ensure dashboard state persists across updates.</div>
+                        <div class="code-container">
+                            <button class="copy-btn" title="Copy to clipboard">
+                                <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                            </button>
+                            <pre><code>docker run -d -p 3000:3000 --name=grafana \
+  -v grafana-storage:/var/lib/grafana \
+  grafana/grafana-enterprise</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Windows Deep Dive & Service configuration -->
+        <section id="windows-service-section" class="card">
+            <div class="card-title">
+                <svg viewBox="0 0 24 24"><path d="M19 13H5v-2h14v2z"/></svg>
+                Windows Production Deep Dive
+            </div>
+            <p style="color: var(--text-secondary); margin-bottom: 2rem; max-width: 900px;">
+                When running Grafana on Windows servers for production, launching it through terminal windows is unreliable. Register the binary as a background system service to guarantee it runs on host restarts.
+            </p>
+
+            <div class="win-grid">
+                <div class="step-card">
+                    <div class="step-title">Step 1: Install Service via PowerShell</div>
+                    <div class="step-desc">Use the built-in service flag commands within PowerShell (Admin) to register the executable.</div>
+                    <div class="code-container">
+                        <button class="copy-btn" title="Copy to clipboard">
+                            <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                        </button>
+                        <pre><code># Run in PowerShell (Admin Mode)
+cd C:\grafana\bin
+
+# Register service
+.\grafana-server.exe --service-install</code></pre>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-title">Step 2: Service Management Actions</div>
+                    <div class="step-desc">Once registered, manage its state using the Windows Service CLI wrappers or Services UI (<code>services.msc</code>).</div>
+                    <div class="code-container">
+                        <button class="copy-btn" title="Copy to clipboard">
+                            <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                        </button>
+                        <pre><code># Start Grafana Service
+Start-Service -Name "Grafana"
+
+# Stop Grafana Service
+Stop-Service -Name "Grafana"
+
+# Check execution health state
+Get-Service -Name "Grafana"</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="callout info" style="margin-top: 1.5rem;">
+                <div class="callout-title">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                    Windows Uninstall Options
+                </div>
+                If you ever need to deregister the service, run: <code>.\grafana-server.exe --service-uninstall</code> from your installation path directory.
+            </div>
+        </section>
+
+        <!-- Section: Searchable CLI Cheat Sheet & Plugin Builder Grid -->
+        <section id="cli-section" class="cli-section">
+            <!-- CLI Cheat sheet column -->
+            <div class="card">
+                <div class="card-title">
+                    <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10H7v-2h10v2z"/></svg>
+                    CLI & Daemon Commands
+                </div>
+                
+                <!-- Search bar input -->
+                <div class="search-container">
+                    <input type="text" id="command-search" class="search-input" placeholder="Search basic commands (e.g. plugins, restart, config)...">
+                    <svg class="search-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                </div>
+
+                <div class="commands-list" id="commands-list">
+                    <!-- Command item 1 -->
+                    <div class="command-item" data-keywords="plugins list install grafana-cli">
+                        <div class="command-header">
+                            <span class="command-name">grafana-cli plugins list-remote</span>
+                            <span class="command-tag">Plugins</span>
+                        </div>
+                        <div class="command-desc">Query and retrieve lists of all officially available cloud plugins.</div>
+                        <div class="code-container">
+                            <button class="copy-btn" title="Copy to clipboard">
+                                <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                            </button>
+                            <pre><code>grafana-cli plugins list-remote</code></pre>
+                        </div>
+                    </div>
+
+                    <!-- Command item 2 -->
+                    <div class="command-item" data-keywords="plugins install grafana-cli download add">
+                        <div class="command-header">
+                            <span class="command-name">grafana-cli plugins install [plugin-id]</span>
+                            <span class="command-tag">Plugins</span>
+                        </div>
+                        <div class="command-desc">Download and install a plugin directly from repository archives.</div>
+                        <div class="code-container">
+                            <button class="copy-btn" title="Copy to clipboard">
+                                <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                            </button>
+                            <pre><code>grafana-cli plugins install grafana-piechart-panel</code></pre>
+                        </div>
+                    </div>
+
+                    <!-- Command item 3 -->
+                    <div class="command-item" data-keywords="plugins update update-all update plugins grafana-cli">
+                        <div class="command-header">
+                            <span class="command-name">grafana-cli plugins update-all</span>
+                            <span class="command-tag">Plugins</span>
+                        </div>
+                        <div class="command-desc">Update all installed plugins to their latest versions.</div>
+                        <div class="code-container">
+                            <button class="copy-btn" title="Copy to clipboard">
+                                <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                            </button>
+                            <pre><code>grafana-cli plugins update-all</code></pre>
+                        </div>
+                    </div>
+
+                    <!-- Command item 4 -->
+                    <div class="command-item" data-keywords="plugins uninstall delete remove grafana-cli">
+                        <div class="command-header">
+                            <span class="command-name">grafana-cli plugins remove [plugin-id]</span>
+                            <span class="command-tag">Plugins</span>
+                        </div>
+                        <div class="command-desc">Deregister and remove a plugin from the local environment folders.</div>
+                        <div class="code-container">
+                            <button class="copy-btn" title="Copy to clipboard">
+                                <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                            </button>
+                            <pre><code>grafana-cli plugins remove grafana-piechart-panel</code></pre>
+                        </div>
+                    </div>
+
+                    <!-- Command item 5 -->
+                    <div class="command-item" data-keywords="admin password reset CLI cmd change">
+                        <div class="command-header">
+                            <span class="command-name">grafana-cli admin reset-admin-password [pwd]</span>
+                            <span class="command-tag">Administration</span>
+                        </div>
+                        <div class="command-desc">Reset the password for the primary admin user if credentials are lost.</div>
+                        <div class="code-container">
+                            <button class="copy-btn" title="Copy to clipboard">
+                                <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                            </button>
+                            <pre><code>grafana-cli admin reset-admin-password newSecurePassword123</code></pre>
+                        </div>
+                    </div>
+
+                    <!-- Command item 6 -->
+                    <div class="command-item" data-keywords="restart service systemctl systemd stop start linux status">
+                        <div class="command-header">
+                            <span class="command-name">sudo systemctl restart grafana-server</span>
+                            <span class="command-tag">Daemon Management</span>
+                        </div>
+                        <div class="command-desc">Restart the system service daemon on Debian/RedHat based Linux engines.</div>
+                        <div class="code-container">
+                            <button class="copy-btn" title="Copy to clipboard">
+                                <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                            </button>
+                            <pre><code>sudo systemctl restart grafana-server</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Plugin Builder Form widget -->
+            <div id="builder-section" class="card builder-card">
+                <div class="card-title" style="color: var(--primary-orange);">
+                    <svg viewBox="0 0 24 24"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.5 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/></svg>
+                    Plugin Command Builder
+                </div>
+                <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1.5rem;">
+                    Input details to dynamically generate CLI commands for plugin management actions.
+                </p>
+
+                <div class="builder-field">
+                    <label class="builder-label" for="action-select">Action Type</label>
+                    <select id="action-select" class="builder-select">
+                        <option value="install">Install Plugin</option>
+                        <option value="remove">Remove Plugin</option>
+                        <option value="update">Update Plugin</option>
+                    </select>
+                </div>
+
+                <div class="builder-field">
+                    <label class="builder-label" for="plugin-name">Plugin Identifier</label>
+                    <input type="text" id="plugin-name" class="builder-input" placeholder="e.g. grafana-clock-panel" value="grafana-clock-panel">
+                </div>
+
+                <div class="builder-field">
+                    <label class="builder-label" for="cli-env">Environment Type</label>
+                    <select id="cli-env" class="builder-select">
+                        <option value="standard">Standard CLI (Windows/Linux/Mac)</option>
+                        <option value="docker">Docker Environment CLI</option>
+                    </select>
+                </div>
+
+                <button id="generate-btn" class="builder-btn">Generate Command</button>
+
+                <div class="builder-output">
+                    <label class="builder-label">Resulting Execution Command</label>
+                    <div class="code-container" style="background: #050608; border-color: rgba(240, 90, 40, 0.2);">
+                        <button class="copy-btn" id="builder-copy-btn" title="Copy to clipboard">
+                            <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                        </button>
+                        <pre><code id="builder-code">grafana-cli plugins install grafana-clock-panel</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="max-width: 1200px; margin: 0 auto;">
+            <p>&copy; 2026 Grafana DevOps Installation Guide. Designed for fast and efficient systems deployment.</p>
+            <p>Read more detailed guides at <a href="https://grafana.com/docs/" target="_blank">Grafana Documentation</a>.</p>
+        </div>
+    </footer>
+
+    <script>
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Tab Switcher Logic
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    const tabPanes = document.querySelectorAll('.tab-pane');
+
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const targetTab = button.getAttribute('data-tab');
+
+            // Deactivate all buttons
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            // Deactivate all panes
+            tabPanes.forEach(pane => pane.classList.remove('active'));
+
+            // Activate clicked button and corresponding pane
+            button.classList.add('active');
+            const activePane = document.getElementById(targetTab);
+            if (activePane) {
+                activePane.classList.add('active');
+            }
+        });
+    });
+
+    // 2. Copy to Clipboard Functionality
+    const copyButtons = document.querySelectorAll('.copy-btn');
+
+    copyButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            // Find code element associated with this copy button
+            const codeBlock = button.parentElement.querySelector('pre code');
+            if (!codeBlock) return;
+
+            // Clean code text (remove comments that start with # for execution ease if needed, or copy full block)
+            // We copy full block contents
+            const textToCopy = codeBlock.textContent.trim();
+
+            navigator.clipboard.writeText(textToCopy)
+                .then(() => {
+                    // Show success feedback state
+                    button.classList.add('copied');
+                    
+                    // Reset copy button status after 2 seconds
+                    setTimeout(() => {
+                        button.classList.remove('copied');
+                    }, 2000);
+                })
+                .catch(err => {
+                    console.error('Failed to copy text: ', err);
+                });
+        });
+    });
+
+    // 3. CLI Command Search & Filter
+    const searchInput = document.getElementById('command-search');
+    const commandItems = document.querySelectorAll('.command-item');
+
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase().trim();
+
+            commandItems.forEach(item => {
+                const keywords = item.getAttribute('data-keywords') ? item.getAttribute('data-keywords').toLowerCase() : '';
+                const name = item.querySelector('.command-name').textContent.toLowerCase();
+                const desc = item.querySelector('.command-desc').textContent.toLowerCase();
+
+                const isMatch = keywords.includes(query) || name.includes(query) || desc.includes(query);
+
+                if (isMatch) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    }
+
+    // 4. Plugin Command Builder Logic
+    const generateBtn = document.getElementById('generate-btn');
+    const actionSelect = document.getElementById('action-select');
+    const pluginInput = document.getElementById('plugin-name');
+    const envSelect = document.getElementById('cli-env');
+    const outputCode = document.getElementById('builder-code');
+
+    if (generateBtn && actionSelect && pluginInput && envSelect && outputCode) {
+        generateBtn.addEventListener('click', () => {
+            const action = actionSelect.value;
+            const plugin = pluginInput.value.trim() || 'plugin-id';
+            const env = envSelect.value;
+
+            let generatedCommand = '';
+
+            if (env === 'standard') {
+                if (action === 'install') {
+                    generatedCommand = `grafana-cli plugins install ${plugin}`;
+                } else if (action === 'remove') {
+                    generatedCommand = `grafana-cli plugins remove ${plugin}`;
+                } else if (action === 'update') {
+                    generatedCommand = `grafana-cli plugins update ${plugin}`;
+                }
+            } else if (env === 'docker') {
+                if (action === 'install') {
+                    generatedCommand = `docker exec -it grafana grafana-cli plugins install ${plugin}`;
+                } else if (action === 'remove') {
+                    generatedCommand = `docker exec -it grafana grafana-cli plugins remove ${plugin}`;
+                } else if (action === 'update') {
+                    generatedCommand = `docker exec -it grafana grafana-cli plugins update ${plugin}`;
+                }
+            }
+
+            // Update output code text content
+            outputCode.textContent = generatedCommand;
+        });
+    }
+});
+    </script>
+</body>
+</html>
