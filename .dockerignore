@@ -1,0 +1,16 @@
+# Git Repository Files
+.git
+.gitignore
+
+# Docker configuration files
+.dockerignore
+Dockerfile
+
+# Local Editor / IDE folders
+.vscode/
+.idea/
+*.suo
+*.sln
+
+# Documentation / Markdown
+README.md
