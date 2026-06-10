@@ -21,6 +21,7 @@
 
 ## 🌐 Live Web Page
 Access the live interactive deployment of the guide here:  
+
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-orange?style=for-the-badge&logo=github)](https://ajaygangwar945.github.io/Grafana-Navigator/)
 
 ---
@@ -44,7 +45,7 @@ Since the page is self-contained in a single file, you can run it directly by op
 python -m http.server
 ```
 
-### 🐳 Docker Support
+### 🐳 Running with Docker
 This project includes a lightweight Nginx container configuration.
 
 1. **Build the image**:
