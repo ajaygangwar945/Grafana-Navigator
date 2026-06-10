@@ -1,0 +1,76 @@
+========================================================================
+GRAFANA NAVIGATOR - PROJECT DOCUMENTATION & BUILD STEP-BY-STEP
+========================================================================
+
+This document chronicles the step-by-step process of how this project
+was built, unified, branded, optimized, and automated for deployment.
+
+------------------------------------------------------------------------
+STEP 1: UNIFICATION OF FILES
+------------------------------------------------------------------------
+Originally, the project was split into three files:
+- index.html (Structure)
+- styles.css (Styling)
+- script.js (Interactions)
+
+To make hosting and deployment completely lightweight, all three files 
+were merged into a single standalone document:
+- The content of styles.css was embedded into a <style> block inside the <head>.
+- The content of script.js was embedded into a <script> block at the end of <body>.
+- The original styles.css and script.js files were subsequently deleted to keep
+  the directory clean.
+
+------------------------------------------------------------------------
+STEP 2: OFFICIAL BRANDING & FAVICON
+------------------------------------------------------------------------
+We updated the branding identity to "Grafana Navigator":
+- Set the title tag to <title>Grafana Navigator</title>.
+- Created an inline SVG-based favicon matching the official Grafana flame/bar logo
+  with brand-orange fill (#f05a28).
+- Replaced the placeholder navbar logo with the official Grafana logo SVG path.
+- Updated all UI references (navbar text, metadata description, footer copyright)
+  to "Grafana Navigator".
+
+------------------------------------------------------------------------
+STEP 3: SYNTAX & LAYOUT FIXES
+------------------------------------------------------------------------
+We resolved a visual layout issue on the OS platform switcher tabs:
+- The "Windows" tab button had a premature closing </button> tag right after the
+  SVG icon, causing the text "Windows" to render outside the button.
+- We fixed this by correctly closing the SVG tag first (<svg>...</svg>), restoring
+  perfect layout alignment to the tabs.
+
+------------------------------------------------------------------------
+STEP 4: RESPONSIVE LAYOUT OPTIMIZATIONS (MOBILE & TABLET)
+------------------------------------------------------------------------
+We implemented responsive media queries in Nginx/CSS:
+- Nav Links & Logo stack vertically and wrap gracefully on screens under 768px.
+- Typographic sizes scale down dynamically (Hero header shrinks from 3.5rem to 2.25rem).
+- Page margins and card paddings adjust to fit smaller device screens.
+- Avoided sticky clipboard tooltips on touch devices using "@media (hover: none)".
+
+------------------------------------------------------------------------
+STEP 5: SOURCE CONTROL & BUILD IGNORE FILES
+------------------------------------------------------------------------
+To manage dependencies, build environments, and temporary files:
+- Created a '.gitignore' file to exclude operating system cache files (like .DS_Store),
+  local IDE configuration directories (.vscode/, .idea/), and error logs.
+- Created a '.dockerignore' file to prevent bloating the Docker image build context
+  with git details, local editor settings, and raw markdown documentation files.
+
+------------------------------------------------------------------------
+STEP 6: LIGHTWEIGHT CONTAINERIZATION (DOCKERFILE)
+------------------------------------------------------------------------
+We created a lightweight Docker configuration to host the web page:
+- Wrote a 'Dockerfile' using 'nginx:alpine' as the parent image.
+- Set it up to copy our single 'index.html' directly into Nginx's default HTML folder.
+- Configured Nginx to listen on port 80 and run directly in the foreground.
+
+------------------------------------------------------------------------
+STEP 7: CONTINUOUS INTEGRATION & DEPLOYMENT AUTOMATION
+------------------------------------------------------------------------
+We created a GitHub Actions workflow:
+- Configured a webhook runner at '.github/workflows/docker.yaml'.
+- Set it to trigger automatically on code push commits to the 'main' branch.
+- The pipeline checks out the repository, logs into Docker Hub using secrets,
+  builds the Docker image, and pushes it with the ':latest' tag.
